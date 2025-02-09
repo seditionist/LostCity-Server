@@ -164,7 +164,35 @@
             if (controls === 'true') {
                 hideControls();
             }
-        }
+
+            function saveSettings() {
+                window.top.postMessage(JSON.stringify(localStorage), '*');
+            }
+
+            if (window.top !== window.self) {
+
+                window.addEventListener('message', function(e) {
+                    if (!e.data) {
+                        return;
+                    }
+
+                    let settings = JSON.parse(e.data);
+                    
+                    if (settings.filtering) {
+                        localStorage.setItem('filtering', settings.filtering);
+                    }
+
+                    if (settings.canvasSize) {
+                        localStorage.setItem('canvasSize', settings.canvasSize);
+                    }
+
+                    if (settings.hideControls) {
+                        localStorage.setItem('hideControls', settings.hideControls);
+                    }
+
+                    loadSettings();
+                });
+            }
     </script>
 </head>
  
@@ -193,7 +221,9 @@
             new Client(<%= nodeid %>, <%= lowmem %>, <%= members %>);
         })();
         
-        loadSettings();
+        if (window.top === window.self) {
+            loadSettings();
+        }
     </script>
 </body>
  
